@@ -1,9 +1,9 @@
 import { createMuiTheme } from "@material-ui/core/styles";
-import { red, grey, amber } from "@material-ui/core/colors";
+import { red } from "@material-ui/core/colors";
 
-const font1 = '"Libre Baskerville", serif';
+const font1 = '"Noto Serif", serif';
 
-const font2 = '"Roboto Condensed",sans-serif';
+const font2 = '"Noto Sans",sans-serif';
 
 // Create a theme instance.
 const theme = createMuiTheme({
@@ -19,7 +19,6 @@ const theme = createMuiTheme({
     },
     background: {
       default: "#f1f1f3",
-      // paper: "$fff",
     },
   },
   typography: {

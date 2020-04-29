@@ -1,70 +1,56 @@
 import React from "react";
-import { gql } from "@apollo/client";
-import moment from "moment";
-import { withApollo } from "../utils/apollo";
-import Container from "@material-ui/core/Container";
 import Box from "@material-ui/core/Box";
+import Container from "@material-ui/core/Container";
+import { gql } from "@apollo/client";
+import { useQuery, NetworkStatus } from "@apollo/client";
+import { withApollo } from "../utils/apollo";
 import Layout from "../components/Layout";
-import EventGridQuery from "../components/EventGridQuery";
-import HeroBanner from "../components/HeroBanner";
+import Loading from "../components/Loading";
 
-export const ALL_EVENTS_QUERY = gql`
-  query($first: Int, $offset: Int, $start: Float) {
-    events: Event(
+const EVENT_QUERY = gql`
+  query($first: Int, $offset: Int) {
+    Event(
       first: $first
       offset: $offset
-      filter: {
-        Tag_some: { AND: [{ name: "[Opera Alliance] Boston Opera Calendar" }] }
-        end_datetime_gte: $start
-      }
-      orderBy: [end_datetime_asc]
+      filter: { image_url_not_contains: "generic" }
     ) {
       _id
-      opus_id
       title
-      supertitle_creative
-      alert
-      slug
       image_url
-      displayInstanceDaterange(withYear: true)
-      organizerNames
-      Tag {
-        _id
-        name
-      }
     }
   }
 `;
 
-let defaultStart = parseFloat(moment().format("X"));
-
-export const allEventsQueryVars = {
-  offset: 0,
-  first: 8,
-  start: defaultStart,
+const queryVars = {
+  first: 1,
+  offset: Math.floor(Math.random() * 100),
 };
 
 function Index() {
+  const { data, loading, error } = useQuery(EVENT_QUERY, {
+    variables: queryVars,
+  });
   return (
     <Layout>
-      <HeroBanner tagline={"Boston is an opera town"} />
-      <Container>
-        <Box my={2}>
-          <div
-            style={{
-              borderBottom: "solid 3px",
-              marginBottom: 15,
-              fontSize: "1.2rem",
-              fontWeight: 700,
-              textTransform: "uppercase",
-            }}
-          >
-            Upcoming Performances
-          </div>
-          <EventGridQuery
-            query={ALL_EVENTS_QUERY}
-            variables={allEventsQueryVars}
-          />
+      <Container
+        style={{
+          minHeight: 200,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Box my={2} suppressHydrationWarning={true}>
+          {loading && <Loading />}
+
+          {data &&
+            data?.Event.map((event) => (
+              <img
+                key={event._id}
+                src={event.image_url}
+                style={{ width: "100%" }}
+              />
+            ))}
         </Box>
       </Container>
     </Layout>
